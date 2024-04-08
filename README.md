@@ -14,7 +14,7 @@
   <p align="center">
     Build your own RAG (chatPDF) and run it locally.
   </p>
-  <img src="https://github.com/Isa1asN/local-rag/images/logoimg.png" alt="sshot">
+  <img src="https://github.com/Isa1asN/local-rag/blob/master/images/screenshot.png?raw=true" alt="sshot">
 
 </div>
 
