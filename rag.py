@@ -6,7 +6,8 @@ from langchain_community.document_loaders.pdf import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.prompts import PromptTemplate
-from langchain.vectorstores.utils import filter_complex_metadata
+from langchain_community.vectorstores.utils import filter_complex_metadata
+
 
 
 class ChatPDF:
@@ -15,7 +16,7 @@ class ChatPDF:
     chain = None 
 
     def __init__(self):
-        self.model = ChatOllama(model="llama2:latest")
+        self.model = ChatOllama(model="llama3:latest")
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100)
         self.prompt = PromptTemplate.from_template(
             """
