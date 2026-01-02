@@ -16,7 +16,7 @@ class ChatPDF:
     chain = None 
 
     def __init__(self):
-        self.model = ChatOllama(model="llama3:latest")
+        self.model = ChatOllama(model="llama3.1:8b-instruct-q4_K_M")
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100)
         self.prompt = PromptTemplate.from_template(
             """
@@ -32,12 +32,16 @@ class ChatPDF:
         chunks = self.text_splitter.split_documents(docs)
         chunks = filter_complex_metadata(chunks)
 
-        vector_store = Chroma.from_documents(documents=chunks, embedding=FastEmbedEmbeddings())
-        self.retriever = vector_store.as_retriever(
-            search_type="similarity_score_threshold",
+        self.vector_store = Chroma.from_documents(
+        documents=chunks,
+        embedding=FastEmbedEmbeddings(),
+        persist_directory=".chroma"
+        )
+
+        self.retriever = self.vector_store.as_retriever(
+            search_type="similarity",
             search_kwargs={
-                'k': 3,
-                'score_threshold': 0.5
+                'k': 3
             },
         )
 
@@ -49,10 +53,16 @@ class ChatPDF:
                         | self.model
                         | StrOutputParser()
                        )
-        
+
+    def _has_context(self, query: str) -> bool:
+        docs = self.retriever.get_relevant_documents(query)
+        return len(docs) > 0
+    
     def ask(self, query: str):
         if not self.chain:
             return "Please ingest a PDF file first."
+        if not self._has_context(query):
+            return "No relevant content found in the uploaded document."
         return self.chain.invoke(query)
     
     def clear(self):
